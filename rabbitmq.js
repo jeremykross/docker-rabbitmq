@@ -43,8 +43,14 @@ async.parallel({
         DEFAULT_PASSWORD: "guest"
     });
 
+    let port = 80;
+    try {
+        let proc_opts = JSON.parse(rabbitmq.CS_PROC_OPTS || '{}');
+        port = proc_opts && proc_opts['api-port'] || 80;
+    } catch(err) { /* do nothing */ }
+
     var options = {
-        url: ["http:/", [rabbitmq.CLUSTER_LEADER, "8080"].join(":"), "v1", "hosts"].join("/"),
+        url: `http://${rabbitmq.CLUSTER_LEADER}:${port}/v1/hosts`,
         method: "GET",
         json: true,
         timeout: 5000
