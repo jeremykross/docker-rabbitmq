@@ -112,10 +112,24 @@ async.parallel({
         function(config, fn){
             if(!_.isEmpty(rabbitmq.ERLANG_COOKIE))
                 fs.writeFile("/var/lib/rabbitmq/.erlang.cookie", rabbitmq.ERLANG_COOKIE, { mode: "0600"}, function(err){
-                    if(err)
+                    if(err) {
                         return fn();
+                    }
 
-                    fs.chown("/var/lib/rabbitmq/.erlang.cookie", 101, 0, fn);
+                    var uid;
+                    var proc = child_process.spawn("id", ["-u", "rabbitmq"]);
+
+                    proc.stdout.on("data", function(message){
+                        uid = parseInt(message);
+                    });
+
+                    proc.on("close", function(code){
+                        if(code !== 0) {
+                            return fn(code);
+                        }
+
+                        fs.chown("/var/lib/rabbitmq/.erlang.cookie", uid, 0, fn);
+                    });
                 });
             else
                 return fn();
