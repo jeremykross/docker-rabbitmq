@@ -1,5 +1,5 @@
 {
-  "name": "docker-rabbitmq",
+  "name": "@containership/containership.marketplace.rabbitmq",
   "private": true,
   "description": "Docker image designed to run a rabbitmq cluster on ContainerShip",
   "main": "rabbitmq.js",
